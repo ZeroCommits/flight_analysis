@@ -16,6 +16,9 @@ from tqdm import tqdm
 import json
 import os
 
+path_chromedriver = r'../../../webdrivers/chromedriver.exe'
+path_cache = r'../flight_analysis_app/cached'
+os.makedirs(path_cache, exist_ok=True)
 
 __all__  = ['scrape_data', 'make_url', 'cache_data', 'iterative_caching', 'load_cached', 'clean_cache']
 
@@ -264,7 +267,7 @@ def scrape_data(origin, dest, date_leave, date_return, cache = False) -> dict:
         return data
 
     else:
-        raise WrongTypeError('Incorrect types provided')
+        raise TypeError('Incorrect types provided')
 
 '''
     Construct file name for caching
@@ -327,7 +330,7 @@ def make_url_request(url : list) -> list:
 def make_url_request(url):
     if isinstance(url, str):
         # Instantiate driver and get raw data
-        driver = webdriver.Chrome('/Users/kayacelebi/Downloads/chromedriver')
+        driver = webdriver.Chrome(path_chromedriver)
         driver.get(url)
 
         # Waiting and initial XPATH cleaning
@@ -338,7 +341,7 @@ def make_url_request(url):
 
     if isinstance(url, list):
         # Instantiate driver
-        driver = webdriver.Chrome('/Users/kayacelebi/Downloads/chromedriver')
+        driver = webdriver.Chrome(path_chromedriver)
 
         # Begin getting results for each url
         results = []
@@ -569,8 +572,8 @@ def parse_columns(grouped, date_leave, date_return):
         depart_time += [g[0]]
         arrival_time += [g[1]]
 
-        # When this string shows up we jump ahead an index
-        i_diff += 1 if 'Separate tickets booked together' in g[2] else 0
+        # # When this string shows up we jump ahead an index
+        # i_diff += 1 if 'Separate tickets booked together' in g[2] else 0
 
         # Add airline, travel time, origin, and dest
         airline += [g[2 + i_diff]]
@@ -622,4 +625,3 @@ def parse_columns(grouped, date_leave, date_return):
         'Trip Type' : trip_type,
         'Access Date' : access_date
     }
-
